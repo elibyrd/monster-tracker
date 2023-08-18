@@ -1,0 +1,12 @@
+.monsterContainer {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 1em;
+}
+
+.monsterBox {
+  border: 1px solid black;
+  padding: .75em .5em;
+  margin-right: 1em;
+  text-align: center;
+}
