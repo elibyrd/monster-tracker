@@ -18,6 +18,7 @@ class App extends React.Component {
 
     this.handleAddMonsterFormChange = this.handleAddMonsterFormChange.bind(this);
     this.addMonster = this.addMonster.bind(this);
+    this.handleRemoveMonster = this.handleRemoveMonster.bind(this);
   }
 
   handleAddMonsterFormChange(event) {
@@ -35,6 +36,12 @@ class App extends React.Component {
     event.preventDefault();
   }
 
+  handleRemoveMonster(monsterName) {
+    this.setState({
+      monsters: this.state.monsters.filter(monster => monster.name !== monsterName)
+    });
+  }
+
   render() {
     const monsterList = this.state.monsters.map(monster => {
       return (
@@ -43,6 +50,7 @@ class App extends React.Component {
           name={monster.name}
           maxHealth={monster.maxHealth}
           currentHealth={monster.currentHealth}
+          removeMe={this.handleRemoveMonster}
         />
       )
     });

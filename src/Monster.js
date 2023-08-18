@@ -44,7 +44,7 @@ class Monster extends React.Component {
           onSubmit={this.handleSubmit}
         >
           <label>
-            <span class='sr-only'>Change HP:</span>
+            <span className='sr-only'>Change HP:</span>
             <input
               type="text"
               name="hpDelta"
@@ -57,6 +57,11 @@ class Monster extends React.Component {
             Update HP
           </button>
         </form>
+        <button
+          className='removeMonsterButton'
+          onClick={() => this.props.removeMe(this.state.name)}>
+          Remove
+        </button>
       </div>
     )
   }
