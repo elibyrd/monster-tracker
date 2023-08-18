@@ -44,7 +44,7 @@ class Monster extends React.Component {
           onSubmit={this.handleSubmit}
         >
           <label>
-            Change HP:
+            <span class='sr-only'>Change HP:</span>
             <input
               type="text"
               name="hpDelta"
@@ -54,7 +54,7 @@ class Monster extends React.Component {
           </label>
           <button
             onClick={this.handleSubmit}>
-            go!
+            Update HP
           </button>
         </form>
       </div>
