@@ -20,16 +20,19 @@ class Monster extends React.Component {
     this.handleLegendaryChange = this.handleLegendaryChange.bind(this);
   }
 
+  // Stores the value entered in the HP update box to state.
   handleDelta(event) {
     this.setState({hpDelta: event.target.value});
   }
 
+  // Alters monster's health by the value stored from the HP update box.
   handleHealthSubmit(event) {
     this.setState({ currentHealth: this.state.currentHealth + parseInt(this.state.hpDelta) });
 
     event.preventDefault();
   }
 
+  // Processes ticks and resets to legendary actions and resistances.
   handleLegendaryChange(event) {
     switch(event.target.className){
       case "legendaryActionTick":
@@ -49,6 +52,7 @@ class Monster extends React.Component {
   }
 
   render() {
+    // Only render the legendary action widget if the monster has at least 1 legendary action.
     let legendaryActionWidget;
     if (this.state.maxLegendaryActions){
       legendaryActionWidget = (
@@ -68,6 +72,7 @@ class Monster extends React.Component {
       );
     }
 
+    // Only render the legendary resistance widget if the monster has at least 1 legendary resistance.
     let legendaryResistanceWidget;
     if (this.state.maxLegendaryResistances){
       legendaryResistanceWidget = (

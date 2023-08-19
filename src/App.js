@@ -2,7 +2,6 @@ import './App.css';
 import React from 'react';
 import Monster from './Monster.js';
 
-
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -24,6 +23,7 @@ class App extends React.Component {
     this.handleRemoveMonster = this.handleRemoveMonster.bind(this);
   }
 
+  // Stores all changes to "New Monster" form in state.
   handleAddMonsterFormChange(event) {
     const target = event.target;
     const value = target.value;
@@ -32,6 +32,7 @@ class App extends React.Component {
     this.setState({[name]: value});
   }
 
+  // Adds a new monster to the state using values stored from "New Monster" form.
   addMonster(event) {
     const newMonsterHealth = parseInt(this.state.newMonsterMaxHP);
     const newMonsterLegendaryActions = parseInt(this.state.newMonsterLegendaryActions);
@@ -47,6 +48,7 @@ class App extends React.Component {
     event.preventDefault();
   }
 
+  // Removes the monster with the provided name from the queue.
   handleRemoveMonster(monsterName) {
     this.setState({
       monsters: this.state.monsters.filter(monster => monster.name !== monsterName)
