@@ -1,3 +1,9 @@
+import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import Card from 'react-bootstrap/Card';
+import Col from 'react-bootstrap/Col';
+import Form from 'react-bootstrap/Form';
+import ListGroup from 'react-bootstrap/ListGroup';
 import React from 'react';
 
 class Monster extends React.Component {
@@ -36,8 +42,8 @@ class Monster extends React.Component {
   }
 
   // Processes ticks and resets to legendary actions and resistances.
-  handleLegendaryChange(event) {
-    switch(event.target.className){
+  handleLegendaryChange(action) {
+    switch(action){
       case "legendaryActionTick":
         this.setState({currentLegendaryActions: this.state.currentLegendaryActions - 1});
         break;
@@ -59,19 +65,22 @@ class Monster extends React.Component {
     let legendaryActionWidget;
     if (this.state.maxLegendaryActions){
       legendaryActionWidget = (
-        <div className="legendaryActionWidget">
-          <div className="legendaryActionStatus">Legendary actions: {this.state.currentLegendaryActions} / {this.state.maxLegendaryActions}</div>
-          <button
-            className="legendaryActionTick"
-            onClick={this.handleLegendaryChange}>
-            Tick
-          </button>
-          <button
-            className="legendaryActionReset"
-            onClick={this.handleLegendaryChange}>
-            Reset
-          </button>
-        </div>
+        <ListGroup.Item>
+          <div>Legendary actions</div>
+          <div className="fs-3">{this.state.currentLegendaryActions} / {this.state.maxLegendaryActions}</div>
+          <ButtonGroup aria-label="Legendary action options" className="mt-1">
+            <Button
+              variant="light"
+              onClick={()=> this.handleLegendaryChange('legendaryActionTick')}>
+              Tick
+            </Button>
+            <Button
+              variant="light"
+              onClick={()=> this.handleLegendaryChange('legendaryActionReset')}>
+              Reset
+            </Button>
+          </ButtonGroup>
+        </ListGroup.Item>
       );
     }
 
@@ -79,61 +88,77 @@ class Monster extends React.Component {
     let legendaryResistanceWidget;
     if (this.state.maxLegendaryResistances){
       legendaryResistanceWidget = (
-        <div className="legendaryResistanceWidget">
-          <div className="legendaryResistanceStatus">Legendary resistances: {this.state.currentLegendaryResistances} / {this.state.maxLegendaryResistances}</div>
-          <button
-            className="legendaryResistanceTick"
-            onClick={this.handleLegendaryChange}>
-            Tick
-          </button>
-          <button
-            className="legendaryResistanceReset"
-            onClick={this.handleLegendaryChange}>
-            Reset
-          </button>
-        </div>
+        <ListGroup.Item>
+          <div>Legendary resistances</div>
+          <div className="fs-3">{this.state.currentLegendaryResistances} / {this.state.maxLegendaryResistances}</div>
+          <ButtonGroup aria-label="Legendary resistance options" className="mt-1">
+            <Button
+              variant="light"
+              onClick={()=> this.handleLegendaryChange('legendaryResistanceTick')}>
+              Tick
+            </Button>
+            <Button
+              variant="light"
+              onClick={()=> this.handleLegendaryChange('legendaryResistanceReset')}>
+              Reset
+            </Button>
+          </ButtonGroup>
+        </ListGroup.Item>
       );
     }
 
+    let legendarySection;
+    if(legendaryActionWidget || legendaryResistanceWidget){
+      legendarySection = (
+        <ListGroup variant="flush">
+          {legendaryActionWidget}
+          {legendaryResistanceWidget}
+        </ListGroup>
+      );
+    }
+
+    let cardClass = "text-center w-auto";
+    if(this.state.currentHealth <= (this.state.maxHealth/2)) cardClass += " border-danger text-danger";
+
     return (
-      <div
-        className="monsterBox"
-      >
-        <div>{this.props.name+" "+(this.props.nameDelta + 1)}</div>
-        <div
-          className="healthBox"
-          style={{
-            color: this.state.currentHealth > (this.state.maxHealth/2) ? 'green' : 'red'
-          }}
-        >
-          {this.state.currentHealth} / {this.state.maxHealth}
-        </div>
-        <form
-          className="monsterHealthForm"
-          onSubmit={this.handleHealthSubmit}
-        >
-          <label>
-            <span className='sr-only'>Change HP:</span>
-            <input
-              type="number"
-              name="hpDelta"
-              value={this.state.hpDelta}
-              onChange={this.handleDelta}
-            />
-          </label>
-          <button
-            onClick={this.handleHealthSubmit}>
-            Update HP
-          </button>
-        </form>
-        { legendaryActionWidget }
-        { legendaryResistanceWidget }
-        <button
-          className='removeMonsterButton'
-          onClick={() => this.props.removeMe(this.props.name, this.props.nameDelta)}>
-          Remove
-        </button>
-      </div>
+      <Col>
+        <Card className={cardClass}>
+          <Card.Body>
+            <Card.Title>{this.props.name+" "+(this.props.nameDelta + 1)}</Card.Title>
+            <Card.Text className="fs-1">
+              {this.state.currentHealth} / {this.state.maxHealth}
+            </Card.Text>
+            <Form
+              className="mt-2 d-flex flex-column"
+              onSubmit={this.handleHealthSubmit}
+            >
+              <Form.Group controlId="hpDelta">
+                <Form.Label visuallyHidden='true'>Change HP</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="hpDelta"
+                  value={this.state.hpDelta}
+                  onChange={this.handleDelta}
+                />
+              </Form.Group>
+              <Button
+                variant="secondary"
+                onClick={this.handleHealthSubmit}
+                className="mt-1">
+                Update HP
+              </Button>
+            </Form>
+          </Card.Body>
+          { legendarySection }
+          <Card.Body>
+            <Button
+              variant="danger"
+              onClick={() => this.props.removeMe(this.props.name, this.props.nameDelta)}>
+              Remove
+            </Button>
+          </Card.Body>
+        </Card>
+      </Col>
     )
   }
 

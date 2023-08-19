@@ -1,6 +1,13 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import React from 'react';
+
+import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
+import Col from 'react-bootstrap/Col';
+import Form from 'react-bootstrap/Form';
 import Monster from './Monster.js';
+import React from 'react';
+import Row from 'react-bootstrap/Row';
 
 class App extends React.Component {
   constructor(props) {
@@ -100,61 +107,75 @@ class App extends React.Component {
     });
 
     return (
-      <div className="App">
-        <fieldset
-          className="addMonsterFieldset"
+      <Container className="d-flex flex-column h-100">
+        <h2 className="mt-2">Active Monsters</h2>
+        <Row className="row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
+            {monsterList}
+        </Row>
+        <Form
+          className="mt-auto"
+          onSubmit={this.addMonster}
         >
-          <legend>New Monster</legend>
-          <form
-            className="addMonsterForm"
-            onSubmit={this.addMonster}
-          >
-            <label>
-              Name:
-              <input
-                type="text"
-                name="newMonsterName"
-                value={this.state.newMonsterName}
-                onChange={this.handleAddMonsterFormChange}
-              />
-            </label>
-            <label>
-              Max HP:
-              <input
-                type="number"
-                name="newMonsterMaxHP"
-                value={this.state.newMonsterMaxHP}
-                onChange={this.handleAddMonsterFormChange}
-              />
-            </label>
-            <label>
-              Legendary Actions:
-              <input
-                type="number"
-                name="newMonsterLegendaryActions"
-                value={this.state.newMonsterLegendaryActions}
-                onChange={this.handleAddMonsterFormChange}
-              />
-            </label>
-            <label>
-              Legendary Resistances:
-              <input
-                type="number"
-                name="newMonsterLegendaryResistances"
-                value={this.state.newMonsterLegendaryResistances}
-                onChange={this.handleAddMonsterFormChange}
-              />
-            </label>
-            <button
-              onClick={this.addMonster}>
-              Add Monster
-            </button>
-          </form>
-        </fieldset>
-        <div className="monsterContainer">
-          {monsterList}
-        </div>
-      </div>
+          <Row><Col><h2 className="mt-3">New Monster</h2></Col></Row>
+          <Row className="mb-3 align-items-center">
+            <Col>
+              <Form.Group controlId="newMonsterName">
+                <Form.Label>Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="newMonsterName"
+                  value={this.state.newMonsterName}
+                  onChange={this.handleAddMonsterFormChange}
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group controlId="newMonsterMaxHP">
+                <Form.Label>Max HP</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="newMonsterMaxHP"
+                  value={this.state.newMonsterMaxHP}
+                  onChange={this.handleAddMonsterFormChange}
+                  className='w-auto'
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group controlId="newMonsterLegendaryActions">
+                <Form.Label>Legendary Actions</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="newMonsterLegendaryActions"
+                  value={this.state.newMonsterLegendaryActions}
+                  onChange={this.handleAddMonsterFormChange}
+                  className='w-auto'
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group controlId="newMonsterLegendaryResistances">
+                <Form.Label>Legendary Resistances</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="newMonsterLegendaryResistances"
+                  value={this.state.newMonsterLegendaryResistances}
+                  onChange={this.handleAddMonsterFormChange}
+                  className='w-auto'
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Button
+                variant="primary"
+                type="submit"
+                onClick={this.addMonster}>
+                Add Monster
+              </Button>
+            </Col>
+          </Row>
+        </Form>
+      </Container>
     );
   }
 
