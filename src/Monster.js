@@ -26,9 +26,13 @@ class Monster extends React.Component {
 
   // Alters monster's health by the value stored from the HP update box.
   handleHealthSubmit(event) {
-    this.setState({ currentHealth: this.state.currentHealth + parseInt(this.state.hpDelta) });
-
     event.preventDefault();
+
+    let hpDelta = parseInt(this.state.hpDelta);
+    // Check for invalid data before proceeding.
+    if(Number.isNaN(hpDelta)) return;
+
+    this.setState({ currentHealth: this.state.currentHealth + hpDelta });
   }
 
   // Processes ticks and resets to legendary actions and resistances.
@@ -111,7 +115,7 @@ class Monster extends React.Component {
           <label>
             <span className='sr-only'>Change HP:</span>
             <input
-              type="text"
+              type="number"
               name="hpDelta"
               value={this.state.hpDelta}
               onChange={this.handleDelta}

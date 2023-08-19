@@ -51,11 +51,21 @@ class App extends React.Component {
 
   // Adds a new monster to the state using values stored from "New Monster" form.
   addMonster(event) {
+    event.preventDefault();
+
     const trimmedMonsterName = this.state.newMonsterName.trim();
     const nameDelta = this.getNameDelta(trimmedMonsterName);
     const newMonsterHealth = parseInt(this.state.newMonsterMaxHP);
     const newMonsterLegendaryActions = parseInt(this.state.newMonsterLegendaryActions);
     const newMonsterLegendaryResistances = parseInt(this.state.newMonsterLegendaryResistances);
+
+    // Check for invalid data before proceeding.
+    if(trimmedMonsterName.length <= 0 || Number.isNaN(newMonsterHealth) || Number.isNaN(newMonsterLegendaryActions) || Number.isNaN(newMonsterLegendaryResistances)){
+      alert("The provided monster data was invalid. Please review the New Monster form and try again.")
+      return;
+    }
+
+    // Add new monster to state.
     this.setState({ monsters: [...this.state.monsters, {
       name: trimmedMonsterName,
       nameDelta: nameDelta,
@@ -64,8 +74,6 @@ class App extends React.Component {
       legendaryActions: newMonsterLegendaryActions,
       legendaryResistances: newMonsterLegendaryResistances
     }]});
-
-    event.preventDefault();
   }
 
   // Removes the specified monster from the queue.
@@ -113,7 +121,7 @@ class App extends React.Component {
             <label>
               Max HP:
               <input
-                type="text"
+                type="number"
                 name="newMonsterMaxHP"
                 value={this.state.newMonsterMaxHP}
                 onChange={this.handleAddMonsterFormChange}
@@ -122,7 +130,7 @@ class App extends React.Component {
             <label>
               Legendary Actions:
               <input
-                type="text"
+                type="number"
                 name="newMonsterLegendaryActions"
                 value={this.state.newMonsterLegendaryActions}
                 onChange={this.handleAddMonsterFormChange}
@@ -131,7 +139,7 @@ class App extends React.Component {
             <label>
               Legendary Resistances:
               <input
-                type="text"
+                type="number"
                 name="newMonsterLegendaryResistances"
                 value={this.state.newMonsterLegendaryResistances}
                 onChange={this.handleAddMonsterFormChange}
