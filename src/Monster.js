@@ -5,7 +5,6 @@ class Monster extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: props.name,
       maxHealth: props.maxHealth,
       currentHealth: props.currentHealth,
       hpDelta: 0,
@@ -94,10 +93,9 @@ class Monster extends React.Component {
 
     return (
       <div
-        key={this.state.name}
         className="monsterBox"
       >
-        <div>{this.state.name}</div>
+        <div>{this.props.name+" "+(this.props.nameDelta + 1)}</div>
         <div
           className="healthBox"
           style={{
@@ -128,7 +126,7 @@ class Monster extends React.Component {
         { legendaryResistanceWidget }
         <button
           className='removeMonsterButton'
-          onClick={() => this.props.removeMe(this.state.name)}>
+          onClick={() => this.props.removeMe(this.props.name, this.props.nameDelta)}>
           Remove
         </button>
       </div>

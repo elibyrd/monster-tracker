@@ -8,9 +8,10 @@ class App extends React.Component {
     this.state = {
       monsters: [
         // Test data for development.
-        { name: 'Skeleton', maxHealth: 13, currentHealth: 13 },
-        { name: 'Zomble', maxHealth: 22, currentHealth: 10 },
-        { name: 'Dragon', maxHealth: 256, currentHealth: 256, legendaryActions: 3, legendaryResistances: 2 },
+        { name: 'Skeleton', maxHealth: 13, currentHealth: 13, nameDelta: 0 },
+        { name: 'Skeleton', maxHealth: 13, currentHealth: 11, nameDelta: 1 },
+        { name: 'Zomble', maxHealth: 22, currentHealth: 10, nameDelta: 0 },
+        { name: 'Dragon', maxHealth: 256, currentHealth: 256, nameDelta: 0, legendaryActions: 3, legendaryResistances: 2 },
       ],
       newMonsterName: '',
       newMonsterMaxHP: 0,
@@ -21,6 +22,22 @@ class App extends React.Component {
     this.handleAddMonsterFormChange = this.handleAddMonsterFormChange.bind(this);
     this.addMonster = this.addMonster.bind(this);
     this.handleRemoveMonster = this.handleRemoveMonster.bind(this);
+  }
+
+  // Returns the first available delta for the provided monster name.
+  // The delta system allows us to track multiple monsters of the same type, and "refill" from the lowest available number when adding a new monster of that type.
+  getNameDelta(name){
+    let matchingMonsters = this.state.monsters.filter(monster => monster.name.toLowerCase() === name.toLowerCase());
+    // If there are no other monsters with this name, we can return 0 right away.
+    if(matchingMonsters.length === 0) return 0;
+
+    // Find the first "empty" name delta.
+    let usedMonsterDeltas = matchingMonsters.map(monster => monster.nameDelta);
+    let deltaCounter = 0;
+    // Keep incrementing deltaCounter until we can't find it in usedMonsterDeltas.
+    let checkDelta = function(delta){return delta === deltaCounter};
+    while(usedMonsterDeltas.find(checkDelta) !== undefined) deltaCounter++;
+    return deltaCounter;
   }
 
   // Stores all changes to "New Monster" form in state.
@@ -34,11 +51,14 @@ class App extends React.Component {
 
   // Adds a new monster to the state using values stored from "New Monster" form.
   addMonster(event) {
+    const trimmedMonsterName = this.state.newMonsterName.trim();
+    const nameDelta = this.getNameDelta(trimmedMonsterName);
     const newMonsterHealth = parseInt(this.state.newMonsterMaxHP);
     const newMonsterLegendaryActions = parseInt(this.state.newMonsterLegendaryActions);
     const newMonsterLegendaryResistances = parseInt(this.state.newMonsterLegendaryResistances);
     this.setState({ monsters: [...this.state.monsters, {
-      name: this.state.newMonsterName,
+      name: trimmedMonsterName,
+      nameDelta: nameDelta,
       maxHealth: newMonsterHealth,
       currentHealth: newMonsterHealth,
       legendaryActions: newMonsterLegendaryActions,
@@ -48,10 +68,10 @@ class App extends React.Component {
     event.preventDefault();
   }
 
-  // Removes the monster with the provided name from the queue.
-  handleRemoveMonster(monsterName) {
+  // Removes the specified monster from the queue.
+  handleRemoveMonster(monsterName, monsterNameDelta) {
     this.setState({
-      monsters: this.state.monsters.filter(monster => monster.name !== monsterName)
+      monsters: this.state.monsters.filter(monster => (monster.name.toLowerCase() !== monsterName.toLowerCase() || monster.nameDelta !== monsterNameDelta))
     });
   }
 
@@ -59,8 +79,9 @@ class App extends React.Component {
     const monsterList = this.state.monsters.map(monster => {
       return (
         <Monster
-          key={monster.name}
+          key={monster.name+'-'+monster.nameDelta}
           name={monster.name}
+          nameDelta={monster.nameDelta ?? 0}
           maxHealth={monster.maxHealth}
           currentHealth={monster.currentHealth}
           legendaryActions={monster.legendaryActions ?? 0}
