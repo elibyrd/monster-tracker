@@ -46,6 +46,14 @@
   flex-direction: column;
 }
 
+.legendaryActionWidget, .legendaryResistanceWidget {
+  margin-top: 1em;
+}
+
+.legendaryActionReset, .legendaryResistanceReset {
+  margin-left: .5em;
+}
+
 .removeMonsterButton {
   margin-top: 1em;
 }
