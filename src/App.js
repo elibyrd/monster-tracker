@@ -20,6 +20,7 @@ class App extends React.Component {
         { name: 'Zomble', maxHealth: 22, currentHealth: 10, nameDelta: 0 },
         { name: 'Dragon', maxHealth: 256, currentHealth: 256, nameDelta: 0, legendaryActions: 3, legendaryResistances: 2 },
       ],
+      monsterHistory: [],
       newMonsterName: '',
       newMonsterMaxHP: 0,
       newMonsterLegendaryActions: 0,
@@ -32,6 +33,7 @@ class App extends React.Component {
     this.handleRemoveMonster = this.handleRemoveMonster.bind(this);
     this.renderMonsterElement = this.renderMonsterElement.bind(this);
     this.renderMonsterList = this.renderMonsterList.bind(this);
+    this.undoMonsterChange = this.undoMonsterChange.bind(this);
   }
 
   // Returns the first available delta for the provided monster name.
@@ -83,6 +85,8 @@ class App extends React.Component {
       return;
     }
 
+    // Push current monster array to state history
+    this.updateMonsterHistory();
     // Add new monster to state.
     this.setState({ monsters: [...this.state.monsters, {
       name: trimmedMonsterName,
@@ -101,6 +105,8 @@ class App extends React.Component {
     // Check for invalid data before proceeding.
     if(Number.isNaN(hpDeltaInt)) return;
 
+    // Push current monster array to state history
+    this.updateMonsterHistory();
     // Update monster health in state
     const newMonsters = this.state.monsters.slice();
     const monsterIndex = this.findMonsterIndexByKey(monsterKey);
@@ -113,6 +119,7 @@ class App extends React.Component {
     this.setState({monsters: newMonsters});
   }
 
+  // Returns the index of the provided monster key in the current monsters array.
   findMonsterIndexByKey(monsterKey){
     let checkMonsterKey = function(monster){return (monster.name+'-'+monster.nameDelta) === monsterKey};
     return this.state.monsters.findIndex(checkMonsterKey);
@@ -120,9 +127,32 @@ class App extends React.Component {
 
   // Removes the specified monster from the queue.
   handleRemoveMonster(monsterName, monsterNameDelta) {
+    // Push current monster array to state history
+    this.updateMonsterHistory();
+    // Remove monster.
     this.setState({
       monsters: this.state.monsters.filter(monster => (monster.name.toLowerCase() !== monsterName.toLowerCase() || monster.nameDelta !== monsterNameDelta))
     });
+  }
+
+  // Returns the monsters state to the last stored snapshot.
+  undoMonsterChange() {
+    // Do nothing if there is no history to recover
+    if(this.state.monsterHistory.length <= 0) return;
+
+    this.setState({
+      // Set monster state to most recent snapshot
+      monsters: this.state.monsterHistory[this.state.monsterHistory.length - 1],
+      // Remove last snapshot from monster history
+      monsterHistory: this.state.monsterHistory.slice(0, this.state.monsterHistory.length - 1)
+    });
+  }
+
+  // Pushes the current monsters array to the monsterHistory array.
+  updateMonsterHistory(){
+    // We can use JSON conversion to deep copy the monsters array because it doesn't hold any incompatible data types.
+    const monstersCopy = JSON.parse(JSON.stringify(this.state.monsters));
+    this.setState({ monsterHistory: [...this.state.monsterHistory, monstersCopy]});
   }
 
   // Callback for rendering individual monsters.
@@ -264,6 +294,14 @@ class App extends React.Component {
             </Col>
           </Row>
         </Form>
+        {this.state.monsterHistory.length > 0 &&
+          <Button
+            variant="info"
+            onClick={this.undoMonsterChange}
+            className="position-fixed top-0 end-0 mt-3 me-3">
+            Undo
+          </Button>
+        }
       </Container>
     );
   }
