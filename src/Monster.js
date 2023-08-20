@@ -1,7 +1,6 @@
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Card from 'react-bootstrap/Card';
-import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
 import React from 'react';
@@ -118,7 +117,6 @@ class Monster extends React.Component {
     if(this.state.currentHealth <= (this.props.maxHealth/2)) cardClass += " border-danger text-danger";
 
     return (
-      <Col>
         <Card className={cardClass}>
           <Card.Body>
             <Card.Title>{this.props.displayName}</Card.Title>
@@ -155,7 +153,6 @@ class Monster extends React.Component {
             </Button>
           </Card.Body>
         </Card>
-      </Col>
     )
   }
 

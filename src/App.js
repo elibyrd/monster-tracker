@@ -26,9 +26,11 @@ class App extends React.Component {
       newMonsterLegendaryResistances: 0,
     };
 
-    this.handleAddMonsterFormChange = this.handleAddMonsterFormChange.bind(this);
     this.addMonster = this.addMonster.bind(this);
+    this.handleAddMonsterFormChange = this.handleAddMonsterFormChange.bind(this);
     this.handleRemoveMonster = this.handleRemoveMonster.bind(this);
+    this.renderMonsterElement = this.renderMonsterElement.bind(this);
+    this.renderMonsterList = this.renderMonsterList.bind(this);
   }
 
   // Returns the first available delta for the provided monster name.
@@ -90,33 +92,76 @@ class App extends React.Component {
     });
   }
 
-  render() {
-    const monsterList = this.state.monsters.map(monster => {
+  // Callback for rendering individual monsters.
+  renderMonsterElement(monster){
       // Only add numbers to the's name if there is more than one of its type.
       let matchingMonsters = this.state.monsters.filter(stateMonster => stateMonster.name.toLowerCase() === monster.name.toLowerCase());
       let displayName = monster.name;
       if(matchingMonsters.length > 1) displayName += " " + (monster.nameDelta + 1);
-      return (
-        <Monster
-          key={monster.name+'-'+monster.nameDelta}
-          name={monster.name}
-          displayName={displayName}
-          nameDelta={monster.nameDelta ?? 0}
-          maxHealth={monster.maxHealth}
-          currentHealth={monster.currentHealth}
-          legendaryActions={monster.legendaryActions ?? 0}
-          legendaryResistances={monster.legendaryResistances ?? 0}
-          removeMe={this.handleRemoveMonster}
-        />
-      )
-    });
 
+      return (
+        <Col md="auto" key={monster.name+'-'+monster.nameDelta}>
+          <Monster
+            key={monster.name+'-'+monster.nameDelta}
+            name={monster.name}
+            displayName={displayName}
+            nameDelta={monster.nameDelta ?? 0}
+            maxHealth={monster.maxHealth}
+            currentHealth={monster.currentHealth}
+            legendaryActions={monster.legendaryActions ?? 0}
+            legendaryResistances={monster.legendaryResistances ?? 0}
+            removeMe={this.handleRemoveMonster}
+          />
+        </Col>
+      );
+  }
+
+  // Generates JSX for all monsters, splitting out legendary monsters as necessary.
+  renderMonsterList(){
+    // Split monsters into legendary and normal monsters.
+    let legendaryMonsters = [];
+    let normalMonsters = [];
+    this.state.monsters.forEach((monster) => (monster.legendaryActions || monster.legendaryResistances ? legendaryMonsters : normalMonsters).push(monster));
+    const monsterList = normalMonsters.sort(this.sortMonster).map(this.renderMonsterElement);
+    const legendaryMonsterList = legendaryMonsters.length ? legendaryMonsters.sort(this.sortMonster).map(this.renderMonsterElement) : false;
+
+    // If there are legendary monsters, render them in a separate column.
+    if(legendaryMonsterList){
+      return (
+        <Row className="g-2">
+            <Col className="g-2" md="auto">
+              <Row className="legendaryRow g-2">
+                {legendaryMonsterList}
+              </Row>
+            </Col>
+            <Col>
+              <Row className="g-2">
+                {monsterList}
+              </Row>
+            </Col>
+        </Row>
+      );
+    }
+
+    return (
+      <Row className="g-2">
+          {legendaryMonsterList}
+          {monsterList}
+      </Row>
+    );
+  }
+
+  // Callback for sorting monsters by name and delta.
+  sortMonster(a, b){
+    if(a.name === b.name) return a.nameDelta - b.nameDelta;
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+  }
+
+  render() {
     return (
       <Container className="d-flex flex-column h-100">
         <h2 className="mt-2">Active Monsters</h2>
-        <Row className="row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
-            {monsterList}
-        </Row>
+        {this.renderMonsterList()}
         <Form
           className="mt-auto"
           onSubmit={this.addMonster}
