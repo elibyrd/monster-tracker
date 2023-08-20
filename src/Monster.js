@@ -11,7 +11,7 @@ class Monster extends React.Component {
     super(props);
     this.state = {
       currentHealth: props.currentHealth,
-      hpDelta: 0,
+      hpDelta: '',
       currentLegendaryActions: props.legendaryActions,
       currentLegendaryResistances: props.legendaryResistances,
     };
@@ -34,7 +34,12 @@ class Monster extends React.Component {
     // Check for invalid data before proceeding.
     if(Number.isNaN(hpDelta)) return;
 
-    this.setState({ currentHealth: this.state.currentHealth + hpDelta });
+    if(this.state.hpDelta.indexOf('+') === 0 || this.state.hpDelta.indexOf('-') === 0){
+      this.setState({ currentHealth: this.state.currentHealth + hpDelta });
+      return;
+    }
+
+    this.setState({ currentHealth: hpDelta });
   }
 
   // Processes ticks and resets to legendary actions and resistances.
@@ -130,7 +135,8 @@ class Monster extends React.Component {
               <Form.Group controlId="hpDelta">
                 <Form.Label visuallyHidden='true'>Change HP</Form.Label>
                 <Form.Control
-                  type="number"
+                  type="text"
+                  pattern="[\-\+]?[0-9]*"
                   name="hpDelta"
                   value={this.state.hpDelta}
                   onChange={this.handleDelta}
