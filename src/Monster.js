@@ -12,8 +12,6 @@ class Monster extends React.Component {
     this.state = {
       currentHealth: props.currentHealth,
       hpDelta: '',
-      currentLegendaryActions: props.legendaryActions,
-      currentLegendaryResistances: props.legendaryResistances,
     };
 
     this.handleDelta = this.handleDelta.bind(this);
@@ -35,31 +33,17 @@ class Monster extends React.Component {
 
   // Processes ticks and resets to legendary actions and resistances.
   handleLegendaryChange(action) {
-    switch(action){
-      case "legendaryActionTick":
-        this.setState({currentLegendaryActions: this.state.currentLegendaryActions - 1});
-        break;
-      case "legendaryActionReset":
-        this.setState({currentLegendaryActions: this.props.legendaryActions});
-        break;
-      case "legendaryResistanceTick":
-        this.setState({currentLegendaryResistances: this.state.currentLegendaryResistances - 1});
-        break;
-      case "legendaryResistanceReset":
-        this.setState({currentLegendaryResistances: this.props.legendaryResistances});
-        break;
-      default:
-    }
+    this.props.changeMyLegendaryResources(this.props.myKey, action);
   }
 
   render() {
     // Only render the legendary action widget if the monster has at least 1 legendary action.
     let legendaryActionWidget;
-    if (this.props.legendaryActions){
+    if (this.props.maxLegendaryActions){
       legendaryActionWidget = (
         <ListGroup.Item className="bg-transparent">
           <div>Legendary actions</div>
-          <div className="fs-3">{this.state.currentLegendaryActions} / {this.props.legendaryActions}</div>
+          <div className="fs-3">{this.props.currentLegendaryActions} / {this.props.maxLegendaryActions}</div>
           <ButtonGroup aria-label="Legendary action options" className="mt-1">
             <Button
               variant="light"
@@ -78,11 +62,11 @@ class Monster extends React.Component {
 
     // Only render the legendary resistance widget if the monster has at least 1 legendary resistance.
     let legendaryResistanceWidget;
-    if (this.props.legendaryResistances){
+    if (this.props.maxLegendaryResistances){
       legendaryResistanceWidget = (
         <ListGroup.Item className="bg-transparent">
           <div>Legendary resistances</div>
-          <div className="fs-3">{this.state.currentLegendaryResistances} / {this.props.legendaryResistances}</div>
+          <div className="fs-3">{this.props.currentLegendaryResistances} / {this.props.maxLegendaryResistances}</div>
           <ButtonGroup aria-label="Legendary resistance options" className="mt-1">
             <Button
               variant="light"

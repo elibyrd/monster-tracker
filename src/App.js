@@ -21,7 +21,7 @@ class App extends React.Component {
         { name: 'Skeleton', maxHealth: 13, currentHealth: 13, nameDelta: 0 },
         { name: 'Skeleton', maxHealth: 13, currentHealth: 11, nameDelta: 1 },
         { name: 'Zomble', maxHealth: 22, currentHealth: 10, nameDelta: 0 },
-        { name: 'Dragon', maxHealth: 256, currentHealth: 256, nameDelta: 0, legendaryActions: 3, legendaryResistances: 2 },
+        { name: 'Dragon', maxHealth: 256, currentHealth: 256, nameDelta: 0, maxLegendaryActions: 3, currentLegendaryActions: 2, maxLegendaryResistances: 2, currentLegendaryResistances: 2 },
       ],
       monsterHistory: [],
       newMonsterName: '',
@@ -33,6 +33,7 @@ class App extends React.Component {
 
     this.addMonster = this.addMonster.bind(this);
     this.changeMonsterHealth = this.changeMonsterHealth.bind(this);
+    this.changeMonsterLegendaryResources = this.changeMonsterLegendaryResources.bind(this);
     this.handleAddMonsterFormChange = this.handleAddMonsterFormChange.bind(this);
     this.handleRemoveMonster = this.handleRemoveMonster.bind(this);
     this.renderMonsterElement = this.renderMonsterElement.bind(this);
@@ -103,8 +104,10 @@ class App extends React.Component {
       nameDelta: nameDelta,
       maxHealth: newMonsterHealth,
       currentHealth: newMonsterHealth,
-      legendaryActions: newMonsterLegendaryActions,
-      legendaryResistances: newMonsterLegendaryResistances
+      maxLegendaryActions: newMonsterLegendaryActions,
+      currentLegendaryActions: newMonsterLegendaryActions,
+      maxLegendaryResistances: newMonsterLegendaryResistances,
+      currentLegendaryResistances: newMonsterLegendaryResistances
     }]});
   }
 
@@ -130,6 +133,37 @@ class App extends React.Component {
     // Push current monster array to state history
     this.updateMonsterHistory("Changed health of " + this.getMonsterDisplayName(monsterToModify) + " from " + oldHealth + " to " + newHealth + ".");
     monsterToModify.currentHealth = newHealth;
+    // Push updates to state.
+    this.setState({monsters: newMonsters});
+  }
+  
+  // Processes ticks and resets to legendary actions and resistances.
+  changeMonsterLegendaryResources(monsterKey, action) {
+    const newMonsters = this.state.monsters.slice();
+    const monsterIndex = this.findMonsterIndexByKey(monsterKey);
+    const monsterToModify = newMonsters[monsterIndex];
+    const monsterName = this.getMonsterDisplayName(monsterToModify);
+
+    // Push current monster array to state history and update specified resource.
+    switch(action){
+      case "legendaryActionTick":
+        this.updateMonsterHistory("Reduced "+monsterName+" legendary actions from "+monsterToModify.currentLegendaryActions+" to "+(monsterToModify.currentLegendaryActions-1)+".");
+        monsterToModify.currentLegendaryActions -= 1;
+        break;
+      case "legendaryActionReset":
+        this.updateMonsterHistory("Restored "+monsterName+" legendary actions from "+monsterToModify.currentLegendaryActions+" to "+(monsterToModify.maxLegendaryActions)+".");
+        monsterToModify.currentLegendaryActions = monsterToModify.maxLegendaryActions;
+        break;
+      case "legendaryResistanceTick":
+        this.updateMonsterHistory("Reduced "+monsterName+" legendary resistances from "+monsterToModify.currentLegendaryResistances+" to "+(monsterToModify.currentLegendaryResistances-1)+".");
+        monsterToModify.currentLegendaryResistances -= 1;
+        break;
+      case "legendaryResistanceReset":
+        this.updateMonsterHistory("Restored "+monsterName+" legendary resistances from "+monsterToModify.currentLegendaryResistances+" to "+(monsterToModify.maxLegendaryResistances)+".");
+        monsterToModify.currentLegendaryResistances = monsterToModify.maxLegendaryResistances;
+        break;
+      default:
+    }
     // Push updates to state.
     this.setState({monsters: newMonsters});
   }
@@ -201,9 +235,12 @@ class App extends React.Component {
             nameDelta={monster.nameDelta ?? 0}
             maxHealth={monster.maxHealth}
             currentHealth={monster.currentHealth}
-            legendaryActions={monster.legendaryActions ?? 0}
-            legendaryResistances={monster.legendaryResistances ?? 0}
+            maxLegendaryActions={monster.maxLegendaryActions ?? 0}
+            currentLegendaryActions={monster.currentLegendaryActions ?? 0}
+            maxLegendaryResistances={monster.maxLegendaryResistances ?? 0}
+            currentLegendaryResistances={monster.currentLegendaryResistances ?? 0}
             changeMyHealth={this.changeMonsterHealth}
+            changeMyLegendaryResources={this.changeMonsterLegendaryResources}
             removeMe={this.handleRemoveMonster}
           />
         </Col>
@@ -215,7 +252,7 @@ class App extends React.Component {
     // Split monsters into legendary and normal monsters.
     let legendaryMonsters = [];
     let normalMonsters = [];
-    this.state.monsters.forEach((monster) => (monster.legendaryActions || monster.legendaryResistances ? legendaryMonsters : normalMonsters).push(monster));
+    this.state.monsters.forEach((monster) => (monster.maxLegendaryActions || monster.maxLegendaryResistances ? legendaryMonsters : normalMonsters).push(monster));
     const monsterList = normalMonsters.sort(this.sortMonster).map(this.renderMonsterElement);
     const legendaryMonsterList = legendaryMonsters.length ? legendaryMonsters.sort(this.sortMonster).map(this.renderMonsterElement) : false;
 
