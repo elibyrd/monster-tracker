@@ -1,6 +1,6 @@
 {
   "short_name": "Monster Tracker",
-  "name": "Tool for managing monsters in combat-heavy TTRPG systems.",
+  "name": "Tool for managing monster resources in combat-heavy TTRPG systems.",
   "icons": [
     {
       "src": "favicon.ico",
