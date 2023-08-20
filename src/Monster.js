@@ -66,7 +66,7 @@ class Monster extends React.Component {
     let legendaryActionWidget;
     if (this.props.legendaryActions){
       legendaryActionWidget = (
-        <ListGroup.Item>
+        <ListGroup.Item className="bg-transparent">
           <div>Legendary actions</div>
           <div className="fs-3">{this.state.currentLegendaryActions} / {this.props.legendaryActions}</div>
           <ButtonGroup aria-label="Legendary action options" className="mt-1">
@@ -89,7 +89,7 @@ class Monster extends React.Component {
     let legendaryResistanceWidget;
     if (this.props.legendaryResistances){
       legendaryResistanceWidget = (
-        <ListGroup.Item>
+        <ListGroup.Item className="bg-transparent">
           <div>Legendary resistances</div>
           <div className="fs-3">{this.state.currentLegendaryResistances} / {this.props.legendaryResistances}</div>
           <ButtonGroup aria-label="Legendary resistance options" className="mt-1">
@@ -111,7 +111,7 @@ class Monster extends React.Component {
     let legendarySection;
     if(legendaryActionWidget || legendaryResistanceWidget){
       legendarySection = (
-        <ListGroup variant="flush">
+        <ListGroup className="bg-transparent" variant="flush">
           {legendaryActionWidget}
           {legendaryResistanceWidget}
         </ListGroup>
@@ -119,7 +119,9 @@ class Monster extends React.Component {
     }
 
     let cardClass = "text-center w-auto";
-    if(this.state.currentHealth <= (this.props.maxHealth/2)) cardClass += " border-danger text-danger";
+    if(this.state.currentHealth > this.props.maxHealth) cardClass += " border-success bg-overheal";
+    else if(this.state.currentHealth <= 0) cardClass += " border-danger bg-dead";
+    else if(this.state.currentHealth <= (this.props.maxHealth/2)) cardClass += " border-warning bg-bloodied";
 
     return (
         <Card className={cardClass}>
