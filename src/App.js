@@ -92,10 +92,15 @@ class App extends React.Component {
 
   render() {
     const monsterList = this.state.monsters.map(monster => {
+      // Only add numbers to the's name if there is more than one of its type.
+      let matchingMonsters = this.state.monsters.filter(stateMonster => stateMonster.name.toLowerCase() === monster.name.toLowerCase());
+      let displayName = monster.name;
+      if(matchingMonsters.length > 1) displayName += " " + (monster.nameDelta + 1);
       return (
         <Monster
           key={monster.name+'-'+monster.nameDelta}
           name={monster.name}
+          displayName={displayName}
           nameDelta={monster.nameDelta ?? 0}
           maxHealth={monster.maxHealth}
           currentHealth={monster.currentHealth}

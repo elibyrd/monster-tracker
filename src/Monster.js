@@ -121,7 +121,7 @@ class Monster extends React.Component {
       <Col>
         <Card className={cardClass}>
           <Card.Body>
-            <Card.Title>{this.props.name+" "+(this.props.nameDelta + 1)}</Card.Title>
+            <Card.Title>{this.props.displayName}</Card.Title>
             <Card.Text className="fs-1">
               {this.state.currentHealth} / {this.props.maxHealth}
             </Card.Text>
