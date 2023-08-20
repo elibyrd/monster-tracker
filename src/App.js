@@ -69,7 +69,15 @@ class App extends React.Component {
     const newMonsterLegendaryResistances = parseInt(this.state.newMonsterLegendaryResistances);
 
     // Check for invalid data before proceeding.
-    if(trimmedMonsterName.length <= 0 || Number.isNaN(newMonsterHealth) || Number.isNaN(newMonsterLegendaryActions) || Number.isNaN(newMonsterLegendaryResistances)){
+    if(
+      trimmedMonsterName.length <= 0
+      || Number.isNaN(newMonsterHealth)
+      || Number.isNaN(newMonsterLegendaryActions)
+      || Number.isNaN(newMonsterLegendaryResistances)
+      || parseInt(newMonsterHealth) < 0
+      || parseInt(newMonsterLegendaryActions) < 0
+      || parseInt(newMonsterLegendaryResistances) < 0
+    ){
       alert("The provided monster data was invalid. Please review the New Monster form and try again.")
       return;
     }
@@ -186,6 +194,7 @@ class App extends React.Component {
                   type="number"
                   name="newMonsterMaxHP"
                   value={this.state.newMonsterMaxHP}
+                  min={0}
                   onChange={this.handleAddMonsterFormChange}
                   className='w-auto'
                 />
@@ -198,6 +207,7 @@ class App extends React.Component {
                   type="number"
                   name="newMonsterLegendaryActions"
                   value={this.state.newMonsterLegendaryActions}
+                  min={0}
                   onChange={this.handleAddMonsterFormChange}
                   className='w-auto'
                 />
@@ -210,6 +220,7 @@ class App extends React.Component {
                   type="number"
                   name="newMonsterLegendaryResistances"
                   value={this.state.newMonsterLegendaryResistances}
+                  min={0}
                   onChange={this.handleAddMonsterFormChange}
                   className='w-auto'
                 />
