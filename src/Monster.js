@@ -11,12 +11,9 @@ class Monster extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      maxHealth: props.maxHealth,
       currentHealth: props.currentHealth,
       hpDelta: 0,
-      maxLegendaryActions: props.legendaryActions,
       currentLegendaryActions: props.legendaryActions,
-      maxLegendaryResistances: props.legendaryResistances,
       currentLegendaryResistances: props.legendaryResistances,
     };
 
@@ -48,13 +45,13 @@ class Monster extends React.Component {
         this.setState({currentLegendaryActions: this.state.currentLegendaryActions - 1});
         break;
       case "legendaryActionReset":
-        this.setState({currentLegendaryActions: this.state.maxLegendaryActions});
+        this.setState({currentLegendaryActions: this.props.legendaryActions});
         break;
       case "legendaryResistanceTick":
         this.setState({currentLegendaryResistances: this.state.currentLegendaryResistances - 1});
         break;
       case "legendaryResistanceReset":
-        this.setState({currentLegendaryResistances: this.state.maxLegendaryResistances});
+        this.setState({currentLegendaryResistances: this.props.legendaryResistances});
         break;
       default:
     }
@@ -63,11 +60,11 @@ class Monster extends React.Component {
   render() {
     // Only render the legendary action widget if the monster has at least 1 legendary action.
     let legendaryActionWidget;
-    if (this.state.maxLegendaryActions){
+    if (this.props.legendaryActions){
       legendaryActionWidget = (
         <ListGroup.Item>
           <div>Legendary actions</div>
-          <div className="fs-3">{this.state.currentLegendaryActions} / {this.state.maxLegendaryActions}</div>
+          <div className="fs-3">{this.state.currentLegendaryActions} / {this.props.legendaryActions}</div>
           <ButtonGroup aria-label="Legendary action options" className="mt-1">
             <Button
               variant="light"
@@ -86,11 +83,11 @@ class Monster extends React.Component {
 
     // Only render the legendary resistance widget if the monster has at least 1 legendary resistance.
     let legendaryResistanceWidget;
-    if (this.state.maxLegendaryResistances){
+    if (this.props.legendaryResistances){
       legendaryResistanceWidget = (
         <ListGroup.Item>
           <div>Legendary resistances</div>
-          <div className="fs-3">{this.state.currentLegendaryResistances} / {this.state.maxLegendaryResistances}</div>
+          <div className="fs-3">{this.state.currentLegendaryResistances} / {this.props.legendaryResistances}</div>
           <ButtonGroup aria-label="Legendary resistance options" className="mt-1">
             <Button
               variant="light"
@@ -118,7 +115,7 @@ class Monster extends React.Component {
     }
 
     let cardClass = "text-center w-auto";
-    if(this.state.currentHealth <= (this.state.maxHealth/2)) cardClass += " border-danger text-danger";
+    if(this.state.currentHealth <= (this.props.maxHealth/2)) cardClass += " border-danger text-danger";
 
     return (
       <Col>
@@ -126,7 +123,7 @@ class Monster extends React.Component {
           <Card.Body>
             <Card.Title>{this.props.name+" "+(this.props.nameDelta + 1)}</Card.Title>
             <Card.Text className="fs-1">
-              {this.state.currentHealth} / {this.state.maxHealth}
+              {this.state.currentHealth} / {this.props.maxHealth}
             </Card.Text>
             <Form
               className="mt-2 d-flex flex-column"
