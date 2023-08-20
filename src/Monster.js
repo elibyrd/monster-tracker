@@ -30,16 +30,7 @@ class Monster extends React.Component {
   handleHealthSubmit(event) {
     event.preventDefault();
 
-    let hpDelta = parseInt(this.state.hpDelta);
-    // Check for invalid data before proceeding.
-    if(Number.isNaN(hpDelta)) return;
-
-    if(this.state.hpDelta.indexOf('+') === 0 || this.state.hpDelta.indexOf('-') === 0){
-      this.setState({ currentHealth: this.state.currentHealth + hpDelta });
-      return;
-    }
-
-    this.setState({ currentHealth: hpDelta });
+    this.props.changeMyHealth(this.props.myKey, this.state.hpDelta);
   }
 
   // Processes ticks and resets to legendary actions and resistances.
@@ -119,16 +110,16 @@ class Monster extends React.Component {
     }
 
     let cardClass = "text-center w-auto";
-    if(this.state.currentHealth > this.props.maxHealth) cardClass += " border-success bg-overheal";
-    else if(this.state.currentHealth <= 0) cardClass += " border-danger bg-dead";
-    else if(this.state.currentHealth <= (this.props.maxHealth/2)) cardClass += " border-warning bg-bloodied";
+    if(this.props.currentHealth > this.props.maxHealth) cardClass += " border-success bg-overheal";
+    else if(this.props.currentHealth <= 0) cardClass += " border-danger bg-dead";
+    else if(this.props.currentHealth <= (this.props.maxHealth/2)) cardClass += " border-warning bg-bloodied";
 
     return (
         <Card className={cardClass}>
           <Card.Body>
             <Card.Title>{this.props.displayName}</Card.Title>
             <Card.Text className="fs-1">
-              {this.state.currentHealth} / {this.props.maxHealth}
+              {this.props.currentHealth} / {this.props.maxHealth}
             </Card.Text>
             <Form
               className="mt-2 d-flex flex-column"

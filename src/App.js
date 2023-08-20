@@ -27,6 +27,7 @@ class App extends React.Component {
     };
 
     this.addMonster = this.addMonster.bind(this);
+    this.changeMonsterHealth = this.changeMonsterHealth.bind(this);
     this.handleAddMonsterFormChange = this.handleAddMonsterFormChange.bind(this);
     this.handleRemoveMonster = this.handleRemoveMonster.bind(this);
     this.renderMonsterElement = this.renderMonsterElement.bind(this);
@@ -93,6 +94,30 @@ class App extends React.Component {
     }]});
   }
 
+  // Alters monster's health by the value stored from the HP update box.
+  changeMonsterHealth(monsterKey, hpDelta) {
+    let hpDeltaInt = parseInt(hpDelta);
+
+    // Check for invalid data before proceeding.
+    if(Number.isNaN(hpDeltaInt)) return;
+
+    // Update monster health in state
+    const newMonsters = this.state.monsters.slice();
+    const monsterIndex = this.findMonsterIndexByKey(monsterKey);
+    if(hpDelta.indexOf('+') === 0 || hpDelta.indexOf('-') === 0){
+      newMonsters[monsterIndex].currentHealth = newMonsters[monsterIndex].currentHealth + hpDeltaInt;
+    }
+    else {
+      newMonsters[monsterIndex].currentHealth = hpDeltaInt;
+    }
+    this.setState({monsters: newMonsters});
+  }
+
+  findMonsterIndexByKey(monsterKey){
+    let checkMonsterKey = function(monster){return (monster.name+'-'+monster.nameDelta) === monsterKey};
+    return this.state.monsters.findIndex(checkMonsterKey);
+  }
+
   // Removes the specified monster from the queue.
   handleRemoveMonster(monsterName, monsterNameDelta) {
     this.setState({
@@ -106,11 +131,13 @@ class App extends React.Component {
       let matchingMonsters = this.state.monsters.filter(stateMonster => stateMonster.name.toLowerCase() === monster.name.toLowerCase());
       let displayName = monster.name;
       if(matchingMonsters.length > 1) displayName += " " + (monster.nameDelta + 1);
+      let key = monster.name+'-'+monster.nameDelta;
 
       return (
         <Col md="auto" key={monster.name+'-'+monster.nameDelta}>
           <Monster
-            key={monster.name+'-'+monster.nameDelta}
+            key={key}
+            myKey={key}
             name={monster.name}
             displayName={displayName}
             nameDelta={monster.nameDelta ?? 0}
@@ -118,6 +145,7 @@ class App extends React.Component {
             currentHealth={monster.currentHealth}
             legendaryActions={monster.legendaryActions ?? 0}
             legendaryResistances={monster.legendaryResistances ?? 0}
+            changeMyHealth={this.changeMonsterHealth}
             removeMe={this.handleRemoveMonster}
           />
         </Col>
