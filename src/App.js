@@ -5,8 +5,11 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
+import ListGroup from 'react-bootstrap/ListGroup';
 import Monster from './Monster.js';
+import Offcanvas from 'react-bootstrap/Offcanvas';
 import React from 'react';
+import ReactTimeAgo from 'react-time-ago'
 import Row from 'react-bootstrap/Row';
 
 class App extends React.Component {
@@ -25,6 +28,7 @@ class App extends React.Component {
       newMonsterMaxHP: 0,
       newMonsterLegendaryActions: 0,
       newMonsterLegendaryResistances: 0,
+      offCanvasOpen: false,
     };
 
     this.addMonster = this.addMonster.bind(this);
@@ -33,6 +37,7 @@ class App extends React.Component {
     this.handleRemoveMonster = this.handleRemoveMonster.bind(this);
     this.renderMonsterElement = this.renderMonsterElement.bind(this);
     this.renderMonsterList = this.renderMonsterList.bind(this);
+    this.toggleOffCanvas = this.toggleOffCanvas.bind(this);
     this.undoMonsterChange = this.undoMonsterChange.bind(this);
   }
 
@@ -61,6 +66,11 @@ class App extends React.Component {
     this.setState({[name]: value});
   }
 
+  // Updates the history window visibility.
+  toggleOffCanvas() {
+    this.setState({offCanvasOpen: !this.state.offCanvasOpen});
+  }
+
   // Adds a new monster to the state using values stored from "New Monster" form.
   addMonster(event) {
     event.preventDefault();
@@ -86,7 +96,7 @@ class App extends React.Component {
     }
 
     // Push current monster array to state history
-    this.updateMonsterHistory();
+    this.updateMonsterHistory("Created new " + trimmedMonsterName + " with " + newMonsterHealth + " health.");
     // Add new monster to state.
     this.setState({ monsters: [...this.state.monsters, {
       name: trimmedMonsterName,
@@ -105,17 +115,22 @@ class App extends React.Component {
     // Check for invalid data before proceeding.
     if(Number.isNaN(hpDeltaInt)) return;
 
-    // Push current monster array to state history
-    this.updateMonsterHistory();
-    // Update monster health in state
+    // Update monster health
     const newMonsters = this.state.monsters.slice();
     const monsterIndex = this.findMonsterIndexByKey(monsterKey);
+    const monsterToModify = newMonsters[monsterIndex];
+    const oldHealth = monsterToModify.currentHealth;
+    let newHealth;
     if(hpDelta.indexOf('+') === 0 || hpDelta.indexOf('-') === 0){
-      newMonsters[monsterIndex].currentHealth = newMonsters[monsterIndex].currentHealth + hpDeltaInt;
+      newHealth = monsterToModify.currentHealth + hpDeltaInt;
     }
     else {
-      newMonsters[monsterIndex].currentHealth = hpDeltaInt;
+      newHealth = hpDeltaInt;
     }
+    // Push current monster array to state history
+    this.updateMonsterHistory("Changed health of " + this.getMonsterDisplayName(monsterToModify) + " from " + oldHealth + " to " + newHealth + ".");
+    monsterToModify.currentHealth = newHealth;
+    // Push updates to state.
     this.setState({monsters: newMonsters});
   }
 
@@ -125,10 +140,22 @@ class App extends React.Component {
     return this.state.monsters.findIndex(checkMonsterKey);
   }
 
+  // Returns the display name for the provided monster.
+  getMonsterDisplayName(monster){
+      // Only add numbers to the's name if there is more than one of its type.
+      let matchingMonsters = this.state.monsters.filter(stateMonster => stateMonster.name.toLowerCase() === monster.name.toLowerCase());
+      let displayName = monster.name;
+      if(matchingMonsters.length > 1) displayName += " " + (monster.nameDelta + 1);
+      return displayName;
+  }
+
   // Removes the specified monster from the queue.
   handleRemoveMonster(monsterName, monsterNameDelta) {
+    const monsterIndex = this.findMonsterIndexByKey(monsterName+'-'+monsterNameDelta);
+    const monsterToRemove = this.state.monsters[monsterIndex];
+    const monsterDisplayName = this.getMonsterDisplayName(monsterToRemove);
     // Push current monster array to state history
-    this.updateMonsterHistory();
+    this.updateMonsterHistory("Removed " + monsterDisplayName + " with " + monsterToRemove.currentHealth + " health.");
     // Remove monster.
     this.setState({
       monsters: this.state.monsters.filter(monster => (monster.name.toLowerCase() !== monsterName.toLowerCase() || monster.nameDelta !== monsterNameDelta))
@@ -140,27 +167,28 @@ class App extends React.Component {
     // Do nothing if there is no history to recover
     if(this.state.monsterHistory.length <= 0) return;
 
+    const lastMonsters = this.state.monsterHistory[this.state.monsterHistory.length - 1].monsters;
     this.setState({
       // Set monster state to most recent snapshot
-      monsters: this.state.monsterHistory[this.state.monsterHistory.length - 1],
+      monsters: lastMonsters,
       // Remove last snapshot from monster history
       monsterHistory: this.state.monsterHistory.slice(0, this.state.monsterHistory.length - 1)
     });
   }
 
   // Pushes the current monsters array to the monsterHistory array.
-  updateMonsterHistory(){
+  updateMonsterHistory(comment){
     // We can use JSON conversion to deep copy the monsters array because it doesn't hold any incompatible data types.
     const monstersCopy = JSON.parse(JSON.stringify(this.state.monsters));
-    this.setState({ monsterHistory: [...this.state.monsterHistory, monstersCopy]});
+    this.setState({ monsterHistory: [...this.state.monsterHistory, {
+      comment: comment,
+      monsters: monstersCopy,
+      timestamp: Date.now(),
+    }]});
   }
 
   // Callback for rendering individual monsters.
   renderMonsterElement(monster){
-      // Only add numbers to the's name if there is more than one of its type.
-      let matchingMonsters = this.state.monsters.filter(stateMonster => stateMonster.name.toLowerCase() === monster.name.toLowerCase());
-      let displayName = monster.name;
-      if(matchingMonsters.length > 1) displayName += " " + (monster.nameDelta + 1);
       let key = monster.name+'-'+monster.nameDelta;
 
       return (
@@ -169,7 +197,7 @@ class App extends React.Component {
             key={key}
             myKey={key}
             name={monster.name}
-            displayName={displayName}
+            displayName={this.getMonsterDisplayName(monster)}
             nameDelta={monster.nameDelta ?? 0}
             maxHealth={monster.maxHealth}
             currentHealth={monster.currentHealth}
@@ -295,12 +323,39 @@ class App extends React.Component {
           </Row>
         </Form>
         {this.state.monsterHistory.length > 0 &&
-          <Button
-            variant="info"
-            onClick={this.undoMonsterChange}
-            className="position-fixed top-0 end-0 mt-3 me-3">
-            Undo
-          </Button>
+          <div className="d-flex flex-column position-fixed top-0 end-0 mt-3 me-3">
+            <Button
+              variant="info"
+              onClick={this.undoMonsterChange}>
+              Undo
+            </Button>
+            <Button
+              variant="light"
+              onClick={this.toggleOffCanvas}
+              className="mt-1">
+              History
+            </Button>
+          </div>
+        }
+        {this.state.monsterHistory.length > 0 &&
+          <Offcanvas
+            show={this.state.offCanvasOpen}
+            onHide={this.toggleOffCanvas}
+            scroll={true}
+            placement="end">
+            <Offcanvas.Header closeButton>
+              <Offcanvas.Title>History</Offcanvas.Title>
+            </Offcanvas.Header>
+            <Offcanvas.Body>
+              <ListGroup variant="flush">
+                {this.state.monsterHistory.toReversed().slice(0, 50).map((item) => (
+                  <ListGroup.Item key={item.timestamp}>
+                    <ReactTimeAgo date={item.timestamp} locale="en-US"/>: {item.comment}
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            </Offcanvas.Body>
+          </Offcanvas>
         }
       </Container>
     );
