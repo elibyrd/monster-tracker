@@ -19,5 +19,9 @@ If you add the same monster (e.g. "Skeleton") multiple times, the tool will auto
 
 In addition to monster health, you can also track legendary actions and reactions. Any monsters with legendary options will appear in a prioritized column on the left. Use the "Tick" button to reduce a legendary counter by 1, and the "Reset" button to refill it to its maximum value.
 
+## History feature
+
+The app stores all changes to health and legendary resources in a history system, which allows you to view and undo changes you may have made in error. Use the "History" button to see a list of recent changes, and the "Undo" button to revert the most recent change.
+
 ## Local setup
 Run `npm install` to install the required dependencies, then `npm start` to boot up a local server. Webpack should launch the application in your default browser, and will also display the URL in the console.
