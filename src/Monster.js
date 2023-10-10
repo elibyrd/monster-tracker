@@ -105,6 +105,11 @@ class Monster extends React.Component {
             <Card.Text className="fs-1">
               {this.props.currentHealth} / {this.props.maxHealth}
             </Card.Text>
+            {this.props.AC ?
+              <Card.Text className="fs-5">
+                AC {this.props.AC}
+              </Card.Text>
+            :''}
             <Form
               className="mt-2 d-flex flex-column"
               onSubmit={this.handleHealthSubmit}

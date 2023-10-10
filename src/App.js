@@ -18,14 +18,15 @@ class App extends React.Component {
     this.state = {
       monsters: [
         // Test data for development.
-        { name: 'Skeleton', maxHealth: 13, currentHealth: 13, nameDelta: 0 },
+        { name: 'Skeleton', maxHealth: 13, currentHealth: 13, AC: 13, nameDelta: 0 },
         { name: 'Skeleton', maxHealth: 13, currentHealth: 11, nameDelta: 1 },
-        { name: 'Zomble', maxHealth: 22, currentHealth: 10, nameDelta: 0 },
+        { name: 'Zomble', maxHealth: 22, currentHealth: 10, AC: 8, nameDelta: 0 },
         { name: 'Dragon', maxHealth: 256, currentHealth: 256, nameDelta: 0, maxLegendaryActions: 3, currentLegendaryActions: 2, maxLegendaryResistances: 2, currentLegendaryResistances: 2 },
       ],
       monsterHistory: [],
       newMonsterName: '',
       newMonsterMaxHP: 0,
+      newMonsterAC: 0,
       newMonsterLegendaryActions: 0,
       newMonsterLegendaryResistances: 0,
       offCanvasOpen: false,
@@ -79,6 +80,7 @@ class App extends React.Component {
     const trimmedMonsterName = this.state.newMonsterName.trim();
     const nameDelta = this.getNameDelta(trimmedMonsterName);
     const newMonsterHealth = parseInt(this.state.newMonsterMaxHP);
+    const newMonsterAC = parseInt(this.state.newMonsterAC);
     const newMonsterLegendaryActions = parseInt(this.state.newMonsterLegendaryActions);
     const newMonsterLegendaryResistances = parseInt(this.state.newMonsterLegendaryResistances);
 
@@ -89,6 +91,7 @@ class App extends React.Component {
       || Number.isNaN(newMonsterLegendaryActions)
       || Number.isNaN(newMonsterLegendaryResistances)
       || parseInt(newMonsterHealth) < 0
+      || parseInt(newMonsterAC) < 0
       || parseInt(newMonsterLegendaryActions) < 0
       || parseInt(newMonsterLegendaryResistances) < 0
     ){
@@ -104,6 +107,7 @@ class App extends React.Component {
       nameDelta: nameDelta,
       maxHealth: newMonsterHealth,
       currentHealth: newMonsterHealth,
+      AC: newMonsterAC,
       maxLegendaryActions: newMonsterLegendaryActions,
       currentLegendaryActions: newMonsterLegendaryActions,
       maxLegendaryResistances: newMonsterLegendaryResistances,
@@ -235,6 +239,7 @@ class App extends React.Component {
             nameDelta={monster.nameDelta ?? 0}
             maxHealth={monster.maxHealth}
             currentHealth={monster.currentHealth}
+            AC={monster.AC}
             maxLegendaryActions={monster.maxLegendaryActions ?? 0}
             currentLegendaryActions={monster.currentLegendaryActions ?? 0}
             maxLegendaryResistances={monster.maxLegendaryResistances ?? 0}
@@ -317,6 +322,19 @@ class App extends React.Component {
                   type="number"
                   name="newMonsterMaxHP"
                   value={this.state.newMonsterMaxHP}
+                  min={0}
+                  onChange={this.handleAddMonsterFormChange}
+                  className='w-auto'
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group controlId="newMonsterAC">
+                <Form.Label>AC</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="newMonsterAC"
+                  value={this.state.newMonsterAC}
                   min={0}
                   onChange={this.handleAddMonsterFormChange}
                   className='w-auto'
