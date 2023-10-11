@@ -6,10 +6,12 @@ import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
+import Markdown from 'react-markdown';
 import Monster from './Monster.js';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import React from 'react';
-import ReactTimeAgo from 'react-time-ago'
+import ReactTimeAgo from 'react-time-ago';
+import remarkGfm from 'remark-gfm';
 import Row from 'react-bootstrap/Row';
 
 class App extends React.Component {
@@ -466,7 +468,21 @@ class App extends React.Component {
             <Offcanvas.Title>Statblock for {this.state.currentStatblockName}</Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body className='statblock'>
-            {this.state.currentStatblock}
+            <Markdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              // Add bootstrap classes to tables formatted via remarkGfm
+              table(props) {
+                const {node, ...rest} = props
+                return <table class='table table-bordered' {...rest} />
+              },
+              thead(props) {
+                const {node, ...rest} = props
+                return <thead class='table-light' {...rest} />
+              }
+            }}>
+              {this.state.currentStatblock}
+            </Markdown>
           </Offcanvas.Body>
         </Offcanvas>
       </Container>
