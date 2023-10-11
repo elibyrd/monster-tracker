@@ -17,6 +17,7 @@ class Monster extends React.Component {
     this.handleDelta = this.handleDelta.bind(this);
     this.handleHealthSubmit = this.handleHealthSubmit.bind(this);
     this.handleLegendaryChange = this.handleLegendaryChange.bind(this);
+    this.handleInfo = this.handleInfo.bind(this);
   }
 
   // Stores the value entered in the HP update box to state.
@@ -34,6 +35,11 @@ class Monster extends React.Component {
   // Processes ticks and resets to legendary actions and resistances.
   handleLegendaryChange(action) {
     this.props.changeMyLegendaryResources(this.props.myKey, action);
+  }
+
+  // Handles click on info button.
+  handleInfo() {
+    this.props.handleInfo(this.props.myKey);
   }
 
   render() {
@@ -101,7 +107,7 @@ class Monster extends React.Component {
     return (
         <Card className={cardClass}>
           <Card.Body>
-            <Card.Title>{this.props.displayName}</Card.Title>
+            <Card.Title> {this.props.displayName} </Card.Title>
             <Card.Text className="fs-1">
               {this.props.currentHealth} / {this.props.maxHealth}
             </Card.Text>
@@ -133,12 +139,19 @@ class Monster extends React.Component {
             </Form>
           </Card.Body>
           { legendarySection }
-          <Card.Body>
+          <Card.Body className='d-flex justify-content-around'>
             <Button
               variant="danger"
               onClick={() => this.props.removeMe(this.props.name, this.props.nameDelta)}>
               Remove
             </Button>
+            {this.props.statblock.length ?
+              <Button
+                variant="secondary"
+                onClick={this.handleInfo}>
+                Info
+              </Button>
+            :''}
           </Card.Body>
         </Card>
     )

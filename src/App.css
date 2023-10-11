@@ -5,3 +5,5 @@ input:invalid {
 .bg-overheal {background-color: rgb(25, 135, 84, .2)!important}
 .bg-bloodied {background-color: rgb(255, 193, 7, .2)!important}
 .bg-dead {background-color: rgb(220 53 69 / .2)!important}
+
+.statblock {white-space: pre-wrap;}

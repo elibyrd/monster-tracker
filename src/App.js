@@ -29,17 +29,22 @@ class App extends React.Component {
       newMonsterAC: 0,
       newMonsterLegendaryActions: 0,
       newMonsterLegendaryResistances: 0,
-      offCanvasOpen: false,
+      newMonsterStatblock: '',
+      historySidebarOpen: false,
+      statblockSidebarOpen: false,
+      currentStatblock: '',
+      currentStatblockName: '',
     };
 
     this.addMonster = this.addMonster.bind(this);
     this.changeMonsterHealth = this.changeMonsterHealth.bind(this);
     this.changeMonsterLegendaryResources = this.changeMonsterLegendaryResources.bind(this);
     this.handleAddMonsterFormChange = this.handleAddMonsterFormChange.bind(this);
+    this.handleMonsterInfo = this.handleMonsterInfo.bind(this);
     this.handleRemoveMonster = this.handleRemoveMonster.bind(this);
     this.renderMonsterElement = this.renderMonsterElement.bind(this);
     this.renderMonsterList = this.renderMonsterList.bind(this);
-    this.toggleOffCanvas = this.toggleOffCanvas.bind(this);
+    this.toggleSidebar = this.toggleSidebar.bind(this);
     this.undoMonsterChange = this.undoMonsterChange.bind(this);
   }
 
@@ -68,9 +73,17 @@ class App extends React.Component {
     this.setState({[name]: value});
   }
 
-  // Updates the history window visibility.
-  toggleOffCanvas() {
-    this.setState({offCanvasOpen: !this.state.offCanvasOpen});
+  // Updates visibility of specified sidebar element.
+  toggleSidebar(sidebarKey) {
+    switch(sidebarKey){
+      case "history":
+        this.setState({historySidebarOpen: !this.state.historySidebarOpen});
+        break;
+      case "statblock":
+        this.setState({statblockSidebarOpen: !this.state.statblockSidebarOpen});
+        break;
+      default:
+    }
   }
 
   // Adds a new monster to the state using values stored from "New Monster" form.
@@ -111,7 +124,8 @@ class App extends React.Component {
       maxLegendaryActions: newMonsterLegendaryActions,
       currentLegendaryActions: newMonsterLegendaryActions,
       maxLegendaryResistances: newMonsterLegendaryResistances,
-      currentLegendaryResistances: newMonsterLegendaryResistances
+      currentLegendaryResistances: newMonsterLegendaryResistances,
+      statblock: this.state.newMonsterStatblock
     }]});
   }
 
@@ -200,6 +214,17 @@ class App extends React.Component {
     });
   }
 
+  // Opens statblock sidebar with specified monster's name and statblock.
+  handleMonsterInfo(monsterKey){
+    const monsterIndex = this.findMonsterIndexByKey(monsterKey);
+    const monsterToDisplay = this.state.monsters[monsterIndex];
+    this.setState({
+      currentStatblockName: this.getMonsterDisplayName(monsterToDisplay),
+      currentStatblock: monsterToDisplay.statblock,
+    });
+    this.toggleSidebar('statblock');
+  }
+
   // Returns the monsters state to the last stored snapshot.
   undoMonsterChange() {
     // Do nothing if there is no history to recover
@@ -244,8 +269,10 @@ class App extends React.Component {
             currentLegendaryActions={monster.currentLegendaryActions ?? 0}
             maxLegendaryResistances={monster.maxLegendaryResistances ?? 0}
             currentLegendaryResistances={monster.currentLegendaryResistances ?? 0}
+            statblock={monster.statblock ?? ''}
             changeMyHealth={this.changeMonsterHealth}
             changeMyLegendaryResources={this.changeMonsterLegendaryResources}
+            handleInfo={this.handleMonsterInfo}
             removeMe={this.handleRemoveMonster}
           />
         </Col>
@@ -304,68 +331,86 @@ class App extends React.Component {
         >
           <Row><Col><h2 className="mt-3">New Monster</h2></Col></Row>
           <Row className="mb-3 align-items-center">
-            <Col>
-              <Form.Group controlId="newMonsterName">
-                <Form.Label>Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="newMonsterName"
-                  value={this.state.newMonsterName}
-                  onChange={this.handleAddMonsterFormChange}
-                />
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group controlId="newMonsterMaxHP">
-                <Form.Label>Max HP</Form.Label>
-                <Form.Control
-                  type="number"
-                  name="newMonsterMaxHP"
-                  value={this.state.newMonsterMaxHP}
-                  min={0}
-                  onChange={this.handleAddMonsterFormChange}
-                  className='w-auto'
-                />
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group controlId="newMonsterAC">
-                <Form.Label>AC</Form.Label>
-                <Form.Control
-                  type="number"
-                  name="newMonsterAC"
-                  value={this.state.newMonsterAC}
-                  min={0}
-                  onChange={this.handleAddMonsterFormChange}
-                  className='w-auto'
-                />
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group controlId="newMonsterLegendaryActions">
-                <Form.Label>Legendary Actions</Form.Label>
-                <Form.Control
-                  type="number"
-                  name="newMonsterLegendaryActions"
-                  value={this.state.newMonsterLegendaryActions}
-                  min={0}
-                  onChange={this.handleAddMonsterFormChange}
-                  className='w-auto'
-                />
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group controlId="newMonsterLegendaryResistances">
-                <Form.Label>Legendary Resistances</Form.Label>
-                <Form.Control
-                  type="number"
-                  name="newMonsterLegendaryResistances"
-                  value={this.state.newMonsterLegendaryResistances}
-                  min={0}
-                  onChange={this.handleAddMonsterFormChange}
-                  className='w-auto'
-                />
-              </Form.Group>
+            <Col className="col-auto">
+              <Row>
+                <Col>
+                  <Form.Group controlId="newMonsterName">
+                    <Form.Label>Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="newMonsterName"
+                      value={this.state.newMonsterName}
+                      onChange={this.handleAddMonsterFormChange}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col>
+                  <Form.Group controlId="newMonsterMaxHP">
+                    <Form.Label>Max HP</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="newMonsterMaxHP"
+                      value={this.state.newMonsterMaxHP}
+                      min={0}
+                      onChange={this.handleAddMonsterFormChange}
+                      className='w-auto'
+                    />
+                  </Form.Group>
+                </Col>
+                <Col>
+                  <Form.Group controlId="newMonsterAC">
+                    <Form.Label>AC</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="newMonsterAC"
+                      value={this.state.newMonsterAC}
+                      min={0}
+                      onChange={this.handleAddMonsterFormChange}
+                      className='w-auto'
+                    />
+                  </Form.Group>
+                </Col>
+                <Col>
+                  <Form.Group controlId="newMonsterLegendaryActions">
+                    <Form.Label>Legendary Actions</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="newMonsterLegendaryActions"
+                      value={this.state.newMonsterLegendaryActions}
+                      min={0}
+                      onChange={this.handleAddMonsterFormChange}
+                      className='w-auto'
+                    />
+                  </Form.Group>
+                </Col>
+                <Col>
+                  <Form.Group controlId="newMonsterLegendaryResistances">
+                    <Form.Label>Legendary Resistances</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="newMonsterLegendaryResistances"
+                      value={this.state.newMonsterLegendaryResistances}
+                      min={0}
+                      onChange={this.handleAddMonsterFormChange}
+                      className='w-auto'
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <Form.Group controlId="newMonsterStatblock">
+                    <Form.Label>Statblock</Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      name="newMonsterStatblock"
+                      value={this.state.newMonsterStatblock}
+                      rows={3}
+                      onChange={this.handleAddMonsterFormChange}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
             </Col>
             <Col>
               <Button
@@ -386,7 +431,7 @@ class App extends React.Component {
             </Button>
             <Button
               variant="light"
-              onClick={this.toggleOffCanvas}
+              onClick={() => this.toggleSidebar('history')}
               className="mt-1">
               History
             </Button>
@@ -394,8 +439,8 @@ class App extends React.Component {
         }
         {this.state.monsterHistory.length > 0 &&
           <Offcanvas
-            show={this.state.offCanvasOpen}
-            onHide={this.toggleOffCanvas}
+            show={this.state.historySidebarOpen}
+            onHide={() => this.toggleSidebar('history')}
             scroll={true}
             placement="end">
             <Offcanvas.Header closeButton>
@@ -412,6 +457,18 @@ class App extends React.Component {
             </Offcanvas.Body>
           </Offcanvas>
         }
+        <Offcanvas
+          show={this.state.statblockSidebarOpen}
+          onHide={() => this.toggleSidebar('statblock')}
+          scroll={true}
+          placement="end">
+          <Offcanvas.Header closeButton>
+            <Offcanvas.Title>Statblock for {this.state.currentStatblockName}</Offcanvas.Title>
+          </Offcanvas.Header>
+          <Offcanvas.Body className='statblock'>
+            {this.state.currentStatblock}
+          </Offcanvas.Body>
+        </Offcanvas>
       </Container>
     );
   }
