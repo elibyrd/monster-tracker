@@ -15,9 +15,16 @@ A monster's card changes color according to its current health:
 
 If you add the same monster (e.g. "Skeleton") multiple times, the tool will automatically number them ("Skeleton 1", "Skeleton 2"). Any new monsters are inserted at the lowest open position. If your tokens or miniatures are numbered, this lets you recycle previously defeated monsters without any renumbering.
 
+### Armor class (AC)
+You can optionally add an armor class (AC) to a monster card by filling in the "AC" field. If you specify a (nonzero) AC when creating a monster, it will appear below the monster's health.
+
 ## Legendary actions and reactions
 
 In addition to monster health, you can also track legendary actions and reactions. Any monsters with legendary options will appear in a prioritized column on the left. Use the "Tick" button to reduce a legendary counter by 1, and the "Reset" button to refill it to its maximum value.
+
+## Statblocks
+
+You can add additional information to a monster's card using the "Statblock" field. This field supports Markdown (including [GitHub Flavored Markdown](https://github.github.com/gfm/)). If you add statblock info when creating a monster, it will be accessible through a flyout sidebar by clicking the "Info" button on that monster's card.
 
 ## History feature
 
