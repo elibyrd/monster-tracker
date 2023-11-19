@@ -1,3 +1,4 @@
 {
-  "PRESETS_ENDPOINT": false
+  "PRESETS_ENDPOINT": false,
+  "SAMPLE_MONSTERS": []
 }

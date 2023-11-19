@@ -19,13 +19,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      monsters: [
-        // Test data for development.
-        { name: 'Skeleton', maxHealth: 13, currentHealth: 13, AC: 13, nameDelta: 0 },
-        { name: 'Skeleton', maxHealth: 13, currentHealth: 11, nameDelta: 1 },
-        { name: 'Zomble', maxHealth: 22, currentHealth: 10, AC: 8, nameDelta: 0 },
-        { name: 'Dragon', maxHealth: 256, currentHealth: 256, nameDelta: 0, maxLegendaryActions: 3, currentLegendaryActions: 2, maxLegendaryResistances: 2, currentLegendaryResistances: 2 },
-      ],
+      monsters: [],
       monsterHistory: [],
       newMonsterName: '',
       newMonsterMaxHP: 0,
@@ -59,10 +53,17 @@ class App extends React.Component {
   componentDidMount() {
     // If we loaded config data, assign to local variables.
     if(configData) {
-      this.monsterEndpoint = configData.PRESETS_ENDPOINT;
-    }
+      if(typeof configData.PRESETS_ENDPOINT === 'string' || configData.PRESETS_ENDPOINT instanceof String){
+        this.monsterEndpoint = configData.PRESETS_ENDPOINT;
+        this.loadMonstersFromEndpoint();
+      }
 
-    this.loadMonstersFromEndpoint();
+      if(Array.isArray(configData.SAMPLE_MONSTERS)){
+        this.setState({
+          monsters: configData.SAMPLE_MONSTERS,
+        });
+      }
+    }
   }
 
   // If a preloads endpoint was supplied in config, load in the monster data.
