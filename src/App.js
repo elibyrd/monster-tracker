@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import configData from "./config.json";
 
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
@@ -36,18 +37,46 @@ class App extends React.Component {
       statblockSidebarOpen: false,
       currentStatblock: '',
       currentStatblockName: '',
+      preloadedMonsters: '',
+      newMonsterSelect: '',
     };
+
+    this.monsterEndpoint = false;
 
     this.addMonster = this.addMonster.bind(this);
     this.changeMonsterHealth = this.changeMonsterHealth.bind(this);
     this.changeMonsterLegendaryResources = this.changeMonsterLegendaryResources.bind(this);
     this.handleAddMonsterFormChange = this.handleAddMonsterFormChange.bind(this);
+    this.handleMonsterSelect = this.handleMonsterSelect.bind(this);
     this.handleMonsterInfo = this.handleMonsterInfo.bind(this);
     this.handleRemoveMonster = this.handleRemoveMonster.bind(this);
     this.renderMonsterElement = this.renderMonsterElement.bind(this);
     this.renderMonsterList = this.renderMonsterList.bind(this);
     this.toggleSidebar = this.toggleSidebar.bind(this);
     this.undoMonsterChange = this.undoMonsterChange.bind(this);
+  }
+
+  componentDidMount() {
+    // If we loaded config data, assign to local variables.
+    if(configData) {
+      this.monsterEndpoint = configData.PRESETS_ENDPOINT;
+    }
+
+    this.loadMonstersFromEndpoint();
+  }
+
+  // If a preloads endpoint was supplied in config, load in the monster data.
+  loadMonstersFromEndpoint(){
+    if(!this.monsterEndpoint) return;
+    fetch(this.monsterEndpoint)
+      .then((res) => res.json())
+      .then((json) => {
+        if(json.data){
+          this.setState({
+            preloadedMonsters: json.data,
+          });
+        }
+      });
   }
 
   // Returns the first available delta for the provided monster name.
@@ -73,6 +102,42 @@ class App extends React.Component {
     const name = target.name;
 
     this.setState({[name]: value});
+  }
+
+  // Special handler for the "presets" select element.
+  handleMonsterSelect(event){
+    // Handle the standard form state change.
+    this.handleAddMonsterFormChange(event);
+    const target = event.target;
+    const value = target.value;
+
+    // Look for the selected monster in our preloads.
+    let checkPreloadedMonsters = function(monster){return String(monster.id) === value};
+    let monsterIndex = this.state.preloadedMonsters.findIndex(checkPreloadedMonsters);
+    // If present, replace the form data with the selected monster's data.
+    if(monsterIndex >= 0){
+      let monster = this.state.preloadedMonsters[monsterIndex];
+      this.setState({
+        newMonsterName: monster.name,
+        newMonsterMaxHP: parseInt(monster.maxHP),
+        newMonsterAC: monster.AC ? parseInt(monster.AC) : 0,
+        newMonsterLegendaryActions: monster.legendaryActions ? parseInt(monster.legendaryActions) : 0,
+        newMonsterLegendaryResistances: monster.legendaryResistance ? parseInt(monster.legendaryResistances) : 0,
+        newMonsterStatblock: monster.statblock ?? '',
+      });
+    }
+    // If we couldn't find a matching monster, the default option was probably selected.
+    // Clear the contents of the New Monster form.
+    else {
+      this.setState({
+        newMonsterName: '',
+        newMonsterMaxHP: 0,
+        newMonsterAC: 0,
+        newMonsterLegendaryActions: 0,
+        newMonsterLegendaryResistances: 0,
+        newMonsterStatblock: '',
+      });
+    }
   }
 
   // Updates visibility of specified sidebar element.
@@ -413,6 +478,26 @@ class App extends React.Component {
                   </Form.Group>
                 </Col>
               </Row>
+              {this.state.preloadedMonsters.length > 0 &&
+              <Row>
+                <Col>
+                  <Form.Group controlId="newMonsterSelect">
+                    <Form.Label>Presets</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="newMonsterSelect"
+                      value={this.state.newMonsterSelect}
+                      onChange={this.handleMonsterSelect}
+                    >
+                      <option value=''>-</option>
+                      {this.state.preloadedMonsters.map((item) => (
+                        <option key={item.id} value={item.id}>{item.name}</option>
+                      ))}
+                    </Form.Control>
+                  </Form.Group>
+                </Col>
+              </Row>
+              }
             </Col>
             <Col>
               <Button
@@ -474,11 +559,11 @@ class App extends React.Component {
               // Add bootstrap classes to tables formatted via remarkGfm
               table(props) {
                 const {node, ...rest} = props
-                return <table class='table table-bordered' {...rest} />
+                return <table className='table table-bordered' {...rest} />
               },
               thead(props) {
                 const {node, ...rest} = props
-                return <thead class='table-light' {...rest} />
+                return <thead className='table-light' {...rest} />
               }
             }}>
               {this.state.currentStatblock}
